@@ -1,0 +1,490 @@
+public OnPlayerPickUpPickup(playerid, pickupid)
+{
+	if(LastPickid[playerid] != -1)
+	{
+		if(LastPickid[playerid] != pickupid)
+		{
+		    if((GetTickCount() - LastPickTime[playerid]) < 200)
+		    {
+				new str[150];
+				format(str, sizeof(str), "{00FF00}<Anti-Cheat>: {FFFFFF}%s(%d) was kicked for using pickup spam hacks (s0beit server lag).", PlayerInfo[playerid][Nick], playerid);
+				AntiCheatNotification(-1, str);
+				return Kick(playerid);
+		    }
+		}
+	}
+	LastPickid[playerid] = pickupid;
+	LastPickTime[playerid] = GetTickCount();
+	if(pickupid == AirstrikeP)
+	{
+		if(!CBaseOwnershipCheck(playerid)) return SendClientMessage(playerid, RED, "Your clan should own clan island to use clan base airstrike missles.");
+		if(StrikeCooled) return SendClientMessage(playerid, RED, "Please wait 1 minute after the last Airstrike Attack.");
+		if(GetPlayerMoney(playerid) < 300000) return SendClientMessage(playerid, RED, "Your need 300.000 $ to launch a Airstrike Attack.");
+		if(strikingplayer != -1)  return SendClientMessage(playerid, RED, "A player is already attempting an Airstrike.");
+		SendClientMessage(playerid, -1, "Open game options, go to your map and right click on the zone you want to nuke within 15 seconds.");
+		SendClientMessage(playerid, -1, "NOTE: You will not get any kill if you airstrike players in their bases.");
+		strikingplayer = playerid;
+		StrikeWait = SetTimerEx("StrikeEnd", 15000, 0, "i", playerid);
+	}
+	else if(pickupid == SP1 || pickupid == SP2 || pickupid == SP3 || pickupid == SP4 || pickupid == SP5 || pickupid == SP6) return ShowDialog(playerid), PlayerPlaySound(playerid, 1058, 0, 0,0);
+	else if(pickupid == RP)
+	{
+		if(GetPlayerTeam(playerid) != TEAM_UK) return SendClientMessage(playerid, 0xFF0000AA, "Only United Kingdom players can use this briefcase.");
+		ShowDialog(playerid);
+		return 1;
+	}
+	else if(pickupid == EP)
+	{
+		if(GetPlayerTeam(playerid) != TEAM_EURASIA) return SendClientMessage(playerid, 0xFF0000AA, "Only Eurasian players can use this briefcase.");
+		ApplyActorAnimation(seller5, "DEALER", "DEALER_DEAL", 3.0, 0, 0, 0, 0, 0); // Deal Drugs
+		ShowDialog(playerid);
+		return 1;
+	}
+	else if(pickupid == AP)
+	{
+		if(GetPlayerTeam(playerid) != TEAM_ARAB) return SendClientMessage(playerid, 0xFF0000AA, "Only Arabian players can use this briefcase.");
+		ApplyActorAnimation(seller4, "DEALER", "DEALER_DEAL", 3.0, 0, 0, 0, 0, 0); // Deal Drugs
+		ShowDialog(playerid);
+		return 1;
+	}
+	else if(pickupid == A2P)
+	{
+		if(GetPlayerTeam(playerid) != TEAM_AUS) return SendClientMessage(playerid, 0xFF0000AA, "Only Australian players can use this briefcase.");
+		ApplyActorAnimation(seller2, "DEALER", "DEALER_DEAL", 3.0, 0, 0, 0, 0, 0); // Deal Drugs
+		ShowDialog(playerid);
+		return 1;
+	}
+	else if(pickupid == MP)
+	{
+		if(GetPlayerTeam(playerid) != TEAM_USA) return SendClientMessage(playerid, 0xFF0000AA, "Only USA players can use this briefcase.");
+		ApplyActorAnimation(seller, "DEALER", "DEALER_DEAL", 3.0, 0, 0, 0, 0, 0); // Deal Drugs
+		ShowDialog(playerid);
+		return 1;
+	}
+	else if(pickupid == CHP)
+	{
+		if(GetPlayerTeam(playerid) != TEAM_CH) return SendClientMessage(playerid, 0xFF0000AA, "Only Brazil players can use this briefcase.");
+		ApplyActorAnimation(seller6, "DEALER", "DEALER_DEAL", 3.0, 0, 0, 0, 0, 0); // Deal Drugs
+		ShowDialog(playerid);
+		return 1;
+	}
+	else if(pickupid == IDP)
+	{
+		if(GetPlayerTeam(playerid) != TEAM_ID) return SendClientMessage(playerid, 0xFF0000AA, "Only Taliban players can use this briefcase.");
+		ApplyActorAnimation(seller7, "DEALER", "DEALER_DEAL", 3.0, 0, 0, 0, 0, 0); // Deal Drugs
+		ShowDialog(playerid);
+		return 1;
+	}
+	else if(pickupid == FRP)
+	{
+		if(GetPlayerTeam(playerid) != TEAM_FRANCE) return SendClientMessage(playerid, 0xFF0000AA, "Only France players can use this briefcase.");
+		ApplyActorAnimation(seller3, "DEALER", "DEALER_DEAL", 3.0, 0, 0, 0, 0, 0); // Deal Drugs
+		ShowDialog(playerid);
+		return 1;
+	}
+	else if(pickupid == CBPick)
+	{
+		if(!CBaseOwnershipCheck(playerid)) return SendClientMessage(playerid, 0xFF0000AA, "Only Clan Base members can use this briefcase.");
+		ShowDialog(playerid);
+		return 1;
+	}
+	else if(pickupid == AirCPick)
+	{
+		ShowDialog(playerid);
+		return 1;
+	}
+	else if(pickupid == AirPick) // Area 51 Nuclear bomb
+	{
+		if(gTeam[playerid] == TEAM_MERC) return SCM(playerid,Dred," Mercenaries can't launch nuclear bombs.");
+		if(AirON == 1) return SCM(playerid,Dred," The Nuclear bomb has been recently used, please try again later.");
+		if(IsPlayerInAnyVehicle(playerid)) return SCM(playerid,Dred,"You need to be onfoot to use NUKE.");
+		if(tCP[BIG] != GetPlayerTeam(playerid)) return SCM(playerid,Dred,"Your team must own Area 51 To use the Nuclear bomb");
+		if(GetPlayerScore(playerid) < 2500) return SCM(playerid,Dred,"You need to be atleast a Colonel (2500 score) to use the Nuclear bomb");
+		if(GetCash(playerid) < 200000) return SCM(playerid,Dred," You need to have $200000 To use the Nuclear bomb");
+		ShowPlayerDialogEx(playerid, 9374, DIALOG_STYLE_LIST, "{FFFFFF}Nuclear Bomb {FFFFFF}Cost :{45FF00} 200000$", "{FFFFFF}Usa\nArabia \nAustralia\nEurasia\nUnited Kingdom\nBrazil\nTaliban\nFrance", "Launch", "Cancel");
+	}
+	else if(pickupid == Air2Pick) // Area 51 Nuclear bomb
+	{
+		if(gTeam[playerid] == TEAM_MERC) return SCM(playerid,Dred," Mercenaries can't launch nuclear bombs.");
+		if(Air2ON == 1) return SCM(playerid,Dred," The Space Nuclear bomb has been recently used, please try again later.");
+		if(IsPlayerInAnyVehicle(playerid)) return SCM(playerid,Dred,"You need to be onfoot to use NUKE.");
+		if(tCP[SPS] != GetPlayerTeam(playerid)) return SCM(playerid,Dred,"Your team must own Space Station To use the Space Nuclear bomb");
+		if(GetPlayerScore(playerid) < 2500) return SCM(playerid,Dred,"You need to be atleast a Colonel (2500 score) to use the Nuclear bomb");
+		if(GetCash(playerid) < 200000) return SCM(playerid,Dred," You need to have $200000 To use the Nuclear bomb");
+		new Float:xx, Float:yy, Float:zz, Float:ww;
+		new ZC[MAX_ZONES];
+		new cat[1800], str[50];
+		new x = PlayerInfo[playerid][InClan];
+		strcat(cat, "Zone\tEnemies\n");
+		for(new i = 0; i < MAX_ZONES; i++)
+		{
+		    xx = ZonesGangCoords[i][0]; zz = ZonesGangCoords[i][2]; yy = ZonesGangCoords[i][1]; ww = ZonesGangCoords[i][3];
+		    foreach(new j: Player)
+		    {
+		        if(x != -1) if(PlayerInfo[j][InClan] == x) goto habibi;
+		        if(gTeam[j] != gTeam[playerid])
+		        {
+		        	if(!PlayerInfo[j][OnDuty])
+					{
+						if(!sttt[j])
+						{
+							if(!PlayerInfo[j][FirstCon])
+							{
+							    if(GetPlayerState(j) != PLAYER_STATE_SPECTATING)
+							    {
+							    	if(IsPlayerInArea(j, xx,yy,zz,ww))
+									{
+									    ZC[i]++;
+									}
+								}
+				            }
+				        }
+					}
+				}
+				habibi: {}
+		    }
+		    format(str, sizeof str, "%s\t%d\n", ZName(i), ZC[i]);
+		    strcat(cat, str);
+		}
+		ShowPlayerDialogEx(playerid, NUKE2_DIALOG, DIALOG_STYLE_TABLIST_HEADERS, "{FFFFFF}Space Nuclear Bomb {FFFFFF}Cost :{45FF00} 200000$", cat, "Launch", "Cancel");
+	}
+	else if(pickupid == LocatorPick) // Area 52 Nuclear bomb
+	{
+		if(gTeam[playerid] == TEAM_MERC) return SCM(playerid,Dred," Mercenaries can't use Locator.");
+		if(IsPlayerInAnyVehicle(playerid)) return SCM(playerid,Dred,"You need to be onfoot to use Locator.");
+		if(tCP[A52] != GetPlayerTeam(playerid)) return SCM(playerid,Dred,"Your team must own Area 52 To use the Locator");
+		PlayerPlaySound(playerid, 41603, 0.0, 0.0, 0.0);
+		new cat[300];
+		new USAL, ARL, EURL, FRL, TALIBL, BRL, SOVL, AUSL;
+		foreach(new i : Player)
+		{
+		    if(gTeam[i] != gTeam[playerid])
+		    {
+		        if(!PlayerInfo[i][OnDuty])
+		        {
+		            if(IsPlayerInArea(i, 994.1957, 1817.512, 1185.533, 2049.596)) EURL++;
+		            if(IsPlayerInArea(i, -875.8406, 1389.667, -607.2495, 1623.225)) ARL++;
+		            if(IsPlayerInArea(i, -309.375,1024.21875,103.125,1211.71875)) SOVL++;
+		            if(IsPlayerInArea(i, -353.515625,2574.21875,-113.28125,2796.875)) USAL++;
+		            if(IsPlayerInArea(i, 89.0625,2418.75,466.40625,2617.96875)) AUSL++;
+		            if(IsPlayerInArea(i, -769.520507, 808.620483, -633.520507, 1056.620483)) BRL++;
+		            if(IsPlayerInArea(i, 929.864990, 2536.129150, 1241.864990, 2720.129150)) TALIBL++;
+		            if(IsPlayerInArea(i, -1658.203125, 2519.53125, -1341.796875, 2759.765)) FRL++;
+		        }
+		    }
+		}
+		format(cat, sizeof cat, "\n{0084C0}USA: {FFFFD6}%d targets\n{FFC900}Arabia: {FFFFD6}%d targets\n{4FF54F}Eurasia: {FFFFD6}%d targets\n{9D4800}France: {FFFFD6}%d targets\n{00995A}Taliban: {FFFFD6}%d targets\n{2DF1FF}Brazil: {FFFFD6}%d targets\n{FF0000}United Kingdom: {FFFFD6}%d targets\n{8000ED}Australia: {FFFFD6}%d targets", USAL, ARL, EURL, FRL, TALIBL, BRL, SOVL, AUSL);
+		ShowPlayerDialogEx(playerid, LOCATOR_DIALOG, DIALOG_STYLE_MSGBOX, "{FFFFD6}Area 52 {8000ED}Local", cat, "OK", "Refresh");
+	}
+	else if(pickupid == FlashPick)
+	{
+		if(gTeam[playerid] == TEAM_MERC) return SCM(playerid,Dred," Mercenaries can't use Locator.");
+		if(IsPlayerInAnyVehicle(playerid)) return SCM(playerid,Dred,"You need to be onfoot to use the Flash Bomb.");
+		if(FlashON == 1) return SCM(playerid,Dred," The Flash Bomb has been recently used, please try again later.");
+		if(tCP[A52] != GetPlayerTeam(playerid)) return SCM(playerid,Dred,"Your team must own Area 52 To use the Flash Bomb.");
+		if(GetPlayerMoney(playerid) < 30000) return ERR(playerid, "You need $30.000 to use the Flash Bomb.");
+		ShowPlayerDialogEx(playerid, FLASH_DIALOG, DIALOG_STYLE_MSGBOX, "{FFFFD6}Area 52 {8000ED}Flash Bomb", "\n\nFlash all enemies in Area 52?\n\nCost: $100000", "Flash", "Cancel");
+	}
+	else if(pickupid == ParaPick)
+	{
+		if(gTeam[playerid] == TEAM_MERC) return SCM(playerid,Dred," Mercenaries can't Base Jump.");
+		if(IsPlayerInAnyVehicle(playerid)) return SCM(playerid,Dred,"You need to be onfoot to use the Base Jump.");
+		if(tCP[A52] != GetPlayerTeam(playerid)) return SCM(playerid,Dred,"Your team must own Area 52 to do a Base Jump.");
+		if(GetPlayerMoney(playerid) < 10000) return ERR(playerid, "You need $10.000 to do a Base Jump.");
+		ShowPlayerDialogEx(playerid, BASEJUMP_DIALOG, DIALOG_STYLE_LIST, "{FFFFD6}Area 52 {8000ED}Base Jump ($10.000)", "{FFFFFF}Usa\nArabia\nAustralia\nEurasia\nUnited Kingdom\nBrazil\nTaliban\nFrance", "Go", "Cancel");
+	}
+	else if(pickupid == CMDPickup)
+	{
+		if(playerid == airvehdriver) return 1;
+		if(ZepDialog[playerid]) return 1;
+		if((GetTickCount() - CMDPickuptick[playerid]) < 6000) return 1;
+		CMDPickuptick[playerid] = GetTickCount();
+		new cat[250], gt = gTeam[playerid];
+		strcat(cat, "{FFFFFF}Remote AirStrike  Control System (RACS){FF0000}\t{FFFFFF}Cost :{45FF00} 50XP\n{FFFFFF}Base Defence (");
+		new CMDBaseDeftic = CMDBaseDeftick[gt];
+		if((GetTickCount() - CMDBaseDeftic) < 3600000)
+		{
+		    new str[19],rem = 3600 - ((GetTickCount() - CMDBaseDeftic)/1000);
+			new seconds = rem % 60;
+			new  minutes = (rem-seconds) /60;
+		    format(str, sizeof str, "Available in %d:%d",minutes, seconds);
+		    strcat(cat, str);
+		} else strcat(cat, "Available Now");
+		strcat(cat, ")\t{FFFFFF}Cost :{45FF00} 70XP\n");
+		if(ZP_Available[gt]) strcat(cat, "{FFFFFF}Zeppelin (Available){FF0000}\t{FFFFFF}Cost :{45FF00} 250XP");
+		else strcat(cat, "{FFFFFF}Zeppelin (In Use){FF0000}\t{FFFFFF}Cost :{45FF00} 250XP");
+		ShowPlayerDialogEx(playerid, CMDCENTER_DIALOG, DIALOG_STYLE_LIST, "Command Center", cat, "Select", "Close");
+	}
+	return 1;
+}
+forward StopTheEffect(playerid);
+public StopTheEffect(playerid)
+{
+	ClearAnimations(playerid, 1);
+	return 1;
+}
+
+forward DecreaseFlash(playerid);
+public DecreaseFlash(playerid)
+{
+	if(WhiteLevel[playerid]>0)
+	{
+
+		switch(WhiteLevel[playerid])
+		{
+
+			case 10:
+			{
+
+				PlayerTextDrawBoxColor(playerid, FlashTD[playerid], 0xFFFFFFE6);
+				PlayerTextDrawShow(playerid, FlashTD[playerid]);
+			}
+			case 9:
+			{
+
+				PlayerTextDrawBoxColor(playerid, FlashTD[playerid], 0xFFFFFFCD);
+				PlayerTextDrawShow(playerid, FlashTD[playerid]);
+			}
+			case 8:
+			{
+
+				PlayerTextDrawBoxColor(playerid, FlashTD[playerid], 0xFFFFFFB4);
+				PlayerTextDrawShow(playerid, FlashTD[playerid]);
+			}
+			case 7:
+			{
+
+				PlayerTextDrawBoxColor(playerid, FlashTD[playerid], 0xFFFFFF9B);
+				PlayerTextDrawShow(playerid, FlashTD[playerid]);
+			}
+			case 6:
+			{
+
+				PlayerTextDrawBoxColor(playerid, FlashTD[playerid], 0xFFFFFF82);
+				PlayerTextDrawShow(playerid, FlashTD[playerid]);
+			}
+			case 5:
+			{
+
+				PlayerTextDrawBoxColor(playerid, FlashTD[playerid], 0xFFFFFF69);
+				PlayerTextDrawShow(playerid, FlashTD[playerid]);
+			}
+			case 4:
+			{
+
+				PlayerTextDrawBoxColor(playerid, FlashTD[playerid], 0xFFFFFF50);
+				PlayerTextDrawShow(playerid, FlashTD[playerid]);
+			}
+			case 3:
+			{
+
+				PlayerTextDrawBoxColor(playerid, FlashTD[playerid], 0xFFFFFF37);
+				PlayerTextDrawShow(playerid, FlashTD[playerid]);
+			}
+			case 2:
+			{
+
+				PlayerTextDrawBoxColor(playerid, FlashTD[playerid], 0xFFFFFF1E);
+				PlayerTextDrawShow(playerid, FlashTD[playerid]);
+			}
+			case 1:
+			{
+
+				PlayerTextDrawBoxColor(playerid, FlashTD[playerid], 0xFFFFFF05);
+				PlayerTextDrawShow(playerid, FlashTD[playerid]);
+			}
+		}
+		WhiteLevel[playerid]--;
+		SetTimerEx("DecreaseFlash", 500, 0, "d", playerid);
+	}
+	else
+	{
+
+		PlayerTextDrawHide(playerid, FlashTD[playerid]);
+		PlayerTextDrawBoxColor(playerid, FlashTD[playerid], 0xFFFFFFFF);
+		UpdateLabelText(playerid);
+	}
+	return 1;
+}
+
+stock SpectateOn(playerid)
+{
+	TogglePlayerSpectating(playerid, 1);
+	foreach(new i : ALIVE1)
+	{
+		SpectatedPlayer[playerid] = i;
+		PlayerSpectatePlayer(playerid, i);
+		break;
+	}
+	new spc = SpectatedPlayer[playerid];
+	IsPlayerSpectating[playerid] = true;
+	new str[128];
+	format(str, 128, "You are now spectating %s (ID:%d). Press fire button to spectate next player. Please Press Aim button if spectate is bugged.", PlayerInfo[spc][Nick], spc);
+	SendClientMessage(playerid, colorSPECTATE, str);
+}
+
+stock SpectateNext(playerid)
+{
+	new bool:canspec, team;
+	if(Iter_Contains(JOINED1, SpectatedPlayer[playerid])) team = 1;
+	else team = 2;
+	if(team == 1)
+	{
+		foreach(new i: ALIVE1)
+		{
+
+			if(i>SpectatedPlayer[playerid])
+			{
+
+				PlayerSpectatePlayer(playerid, i);
+				SpectatedPlayer[playerid] = i;
+				canspec = true;
+				break;
+			}
+		}
+		if(!canspec)
+		{
+			foreach(new i : ALIVE2)
+			{
+				SpectatedPlayer[playerid] = i;
+				PlayerSpectatePlayer(playerid, i);
+				canspec = true;
+				break;
+			}
+		}
+		if(!canspec)
+		{
+			foreach(new i : ALIVE1)
+			{
+				SpectatedPlayer[playerid] = i;
+				PlayerSpectatePlayer(playerid, i);
+				break;
+			}
+		}
+	}
+	else
+	{
+		foreach(new i: ALIVE2)
+		{
+			if(i>SpectatedPlayer[playerid])
+			{
+				PlayerSpectatePlayer(playerid, i);
+				SpectatedPlayer[playerid] = i;
+				canspec = true;
+				break;
+			}
+		}
+		if(!canspec)
+		{
+			foreach(new i : ALIVE1)
+			{
+				SpectatedPlayer[playerid] = i;
+				PlayerSpectatePlayer(playerid, i);
+				canspec = true;
+				break;
+			}
+		}
+		if(!canspec)
+		{
+			foreach(new i : ALIVE2)
+			{
+				SpectatedPlayer[playerid] = i;
+				PlayerSpectatePlayer(playerid, i);
+				break;
+			}
+		}
+	}
+}
+
+stock SpectateNext2(playerid)
+{
+	new bool:canspec, team;
+	if(Iter_Contains(JOINED1, SpectatedPlayer2[playerid])) team = 1;
+	else team = 2;
+	if(team == 1)
+	{
+		foreach(new i: ALIVE1)
+		{
+			if(i>SpectatedPlayer2[playerid])
+			{
+				PlayerSpectatePlayer(playerid, i);
+				SpectatedPlayer2[playerid] = i;
+				canspec = true;
+				break;
+			}
+		}
+		if(!canspec)
+		{
+			foreach(new i : ALIVE2)
+			{
+				SpectatedPlayer2[playerid] = i;
+				PlayerSpectatePlayer(playerid, i);
+				canspec = true;
+				break;
+			}
+		}
+		if(!canspec)
+		{
+			foreach(new i : ALIVE1)
+			{
+				SpectatedPlayer2[playerid] = i;
+				PlayerSpectatePlayer(playerid, i);
+				break;
+			}
+		}
+ 	}
+	else
+	{
+		foreach(new i: ALIVE2)
+		{
+			if(i>SpectatedPlayer2[playerid])
+			{
+				PlayerSpectatePlayer(playerid, i);
+				SpectatedPlayer2[playerid] = i;
+				canspec = true;
+				break;
+			}
+		}
+		if(!canspec)
+		{
+			foreach(new i : ALIVE1)
+			{
+				SpectatedPlayer2[playerid] = i;
+				PlayerSpectatePlayer(playerid, i);
+				canspec = true;
+				break;
+			}
+		}
+		if(!canspec)
+		{
+			foreach(new i : ALIVE2)
+			{
+				SpectatedPlayer2[playerid] = i;
+				PlayerSpectatePlayer(playerid, i);
+				break;
+			}
+		}
+	}
+}
+
+forward syncanim(playerid);
+public syncanim(playerid)
+{
+	if(GetPVarInt(playerid,"roped") == 0) return 0;
+	if( GetPlayerSpeed(playerid) == 0)
+	{
+	 	SetPVarInt(playerid,"roped",0);
+        SetPVarInt(playerid,"chop_id",0);
+        ClearAnimations(playerid);
+        TogglePlayerControllable(playerid,0);
+        TogglePlayerControllable(playerid,1);
+        DestroyDynamicCP(RopeCP[playerid]);
+        SetPlayerHealth(playerid, LastHP[playerid]);
+		SetPlayerArmour(playerid, LastAR[playerid]);
+        for(new destr4=0;destr4<ropelength;destr4++) { DestroyDynamicObject(r0pes[playerid][destr4]); r0pes[playerid][destr4] = -1; }
+        return 0;
+	}
+	SetTimerEx("syncanim",dur,0,"i",playerid);
+	ApplyAnimation(playerid,"ped","abseil",4.0,0,0,0,1,0);
+	return 1;
+}
